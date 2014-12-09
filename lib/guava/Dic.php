@@ -42,7 +42,6 @@ class Dic
         if (is_object($dependency->getClass())) {
             $class = $dependency->getClass()->name;
             array_push($this->dependencies[$className], new $class);
-
         }
     }
 
@@ -50,7 +49,7 @@ class Dic
      * @param String $className
      * @return Array
      */
-    public function getDependencies($className)
+    private function getDependencies($className)
     {
         if ($this->dependencies[$className] !== array()) {
             return $this->dependencies[$className];
