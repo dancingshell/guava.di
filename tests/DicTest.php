@@ -8,19 +8,15 @@ class DIContainer {
 
     /**
      * @param String $className
-     * @param Object $classInstance
      */
-    public function __construct($className, &$classInstance)
+    public function load($className)
     {
-        if (!isset($this->loaders[$className])) {
-            $this->load($className, $classInstance);
-        }
-    }
 
-    public function load($className, &$classInstance)
-    {
-        $this->loaders[$className] = $classInstance;
-        $reflection = new ReflectionClass($className);
+        if (!isset($this->loaders[$className])) {
+            $this->loaders[$className] = new $className;
+        }
+
+        $reflection = new ReflectionClass($this->loaders[$className]);
         $params = $reflection->getConstructor();
 
         $this->dependencies[$className] = array();
@@ -34,13 +30,13 @@ class DIContainer {
         if (is_object($dependency)) {
             $load = explode("\\", "$dependency");
             $instance = new $load[-1];
-            $this->dependencies[$className] =& array_push($class, $instance);
-        }
+            $this->dependencies[$className] =& array_push($this->dependencies[$className], $instance);
 
+        }
         return $this->dependencies[$className];
     }
 
-    public function getDependencies()
+    public function getDependencies($className)
     {
         return $this->dependencies[$className];
     }
