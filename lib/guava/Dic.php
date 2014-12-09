@@ -4,7 +4,6 @@ use ReflectionClass;
 
 class Dic
 {
-
     protected $loaders = array();
     protected $dependencies = array();
 
@@ -23,7 +22,9 @@ class Dic
             $constructor = $reflection->getConstructor();
             $params = $constructor->getParameters();
 
+            //set empty array to push into later
             $this->dependencies[$className] = array();
+
             foreach ($params as $dependency) {
                 $this->setDependencies($className, $dependency);
             }
@@ -37,7 +38,8 @@ class Dic
      */
     public function setDependencies($className, $dependency)
     {
-        if (is_object($dependency)) {
+        //check if param is a object, if true, push new instance of that object into array
+        if (is_object($dependency->getClass())) {
             $class = $dependency->getClass()->name;
             array_push($this->dependencies[$className], new $class);
         }
