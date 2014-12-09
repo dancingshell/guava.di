@@ -1,6 +1,10 @@
 <?php
 namespace guava;
 
+use guava\Dependencies\Bun;
+use guava\Dependencies\Cheese;
+use guava\Dependencies\Meat;
+
 class DicTest extends \PHPUnit_Framework_TestCase {
 
     protected $di;
@@ -13,7 +17,7 @@ class DicTest extends \PHPUnit_Framework_TestCase {
     public function testLoad()
     {
         $this->assertEquals(
-            "test!!!",
+            array(new Bun(), new Cheese(), new Meat()),
             $this->di->load('Sandwich')
         );
     }

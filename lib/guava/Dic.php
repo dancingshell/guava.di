@@ -10,41 +10,43 @@ class Dic
 
     /**
      * @param String $className
+     * @return Array
      */
     public function load($className)
     {
-
         if (!isset($this->loaders[$className])) {
+            //set the name of the class in the loaders array, next time dependencies will already be loaded
             $this->loaders[$className] = '\\guava\\Controllers\\'.$className;
-        }
 
-        $reflection = new \ReflectionMethod('\\guava\\Controllers\\'.$className, '__construct');
-        $params = $reflection->getParameters();
-        $this->dependencies[$className] = array();
-        foreach ($params as $dependency) {
-            $dependency = explode(" ", $dependency);
-            var_dump($dependency);
-            $this->setDependencies($className, $dependency);
+            //create reflection class to inspect the __constructor parameters of the given class tp find dependencies
+            $reflection = new \ReflectionClass('\\guava\\Controllers\\'.$className);
+            $constructor = $reflection->getConstructor();
+            $params = $constructor->getParameters();
+
+            $this->dependencies[$className] = array();
+            foreach ($params as $dependency) {
+                $this->setDependencies($className, $dependency);
+            }
         }
+        return $this->getDependencies($className);
     }
 
+    /**
+     * @param String $className
+     * @param \ReflectionParameter|Object $dependency
+     */
     public function setDependencies($className, $dependency)
     {
         if (is_object($dependency)) {
-            if (strpos($dependency, "\\")) {
-                $test = explode("\\", $dependency);
-                var_dump($test);
-                $load = '\\guava\\Dependencies\\'.end(explode("\\", $dependency));
-            } else {
-                $load = $dependency;
-            }
-            $instance = new $load;
-            array_push($this->dependencies[$className], $instance);
-
+            $class = $dependency->getClass()->name;
+            array_push($this->dependencies[$className], new $class);
         }
-        return $this->dependencies[$className];
     }
 
+    /**
+     * @param String $className
+     * @return Array
+     */
     public function getDependencies($className)
     {
         return $this->dependencies[$className];
