@@ -42,6 +42,7 @@ class Dic
         if (is_object($dependency->getClass())) {
             $class = $dependency->getClass()->name;
             array_push($this->dependencies[$className], new $class);
+
         }
     }
 
@@ -58,7 +59,7 @@ class Dic
     {
         if (isset($this->loaders[$className])) {
             if ($dep == true) {
-                if (!isset($this->dependencies[$className])) {
+                if ($this->dependencies[$className] == array()) {
                     return false;
                 }
             }

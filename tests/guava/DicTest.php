@@ -49,6 +49,16 @@ class DicTest extends \PHPUnit_Framework_TestCase {
             true,
             $this->di->isLoaded('Sandwich', true)
         );
+        // tests class loaded with no constructor dependencies
+        $this->di->load('Smoothie');
+        $this->assertEquals(
+            true,
+            $this->di->isLoaded('Smoothie')
+        );
+        $this->assertEquals(
+            false,
+            $this->di->isLoaded('Smoothie', true)
+        );
 
         // tests after cache is cleared
         $this->di->clearCache('Sandwich');
