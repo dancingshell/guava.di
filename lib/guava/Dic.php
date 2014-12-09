@@ -54,6 +54,19 @@ class Dic
         return $this->dependencies[$className];
     }
 
+    public function isLoaded($className, $dep = false)
+    {
+        if (isset($this->loaders[$className])) {
+            if ($dep == true) {
+                if (!isset($this->dependencies[$className])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     public function clearCache($className = null)
     {
         if ($className !== null) {

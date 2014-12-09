@@ -31,6 +31,38 @@ class DicTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
+    public function testIsLoaded()
+    {
+        // tests before Sandwich is loaded
+        $this->assertEquals(
+            false,
+            $this->di->isLoaded('Sandwich')
+        );
+
+        // tests after Sandwich is loaded
+        $this->di->load('Sandwich');
+        $this->assertEquals(
+            true,
+            $this->di->isLoaded('Sandwich')
+        );
+        $this->assertEquals(
+            true,
+            $this->di->isLoaded('Sandwich', true)
+        );
+
+        // tests after cache is cleared
+        $this->di->clearCache('Sandwich');
+        $this->assertEquals(
+            false,
+            $this->di->isLoaded('Sandwich', true)
+        );
+        $this->assertEquals(
+            false,
+            $this->di->isLoaded('Sandwich')
+        );
+
+    }
+
     public function testClearCache()
     {
         $this->di->load('Sandwich');
