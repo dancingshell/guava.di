@@ -21,4 +21,26 @@ class DicTest extends \PHPUnit_Framework_TestCase {
             $this->di->load('Sandwich')
         );
     }
+
+    public function testGetDependencies()
+    {
+        $this->di->load('Sandwich');
+        $this->assertEquals(
+            array(new Bun(), new Cheese(), new Meat()),
+            $this->di->getDependencies('Sandwich')
+        );
+    }
+
+    public function testClearCache()
+    {
+        $this->di->load('Sandwich');
+        $this->assertEquals(
+            true,
+            $this->di->clearCache('Sandwich')
+        );
+        $this->assertEquals(
+            true,
+            $this->di->clearCache()
+        );
+    }
 }

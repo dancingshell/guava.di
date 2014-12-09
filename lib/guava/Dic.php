@@ -36,7 +36,7 @@ class Dic
      * @param String $className
      * @param \ReflectionParameter|Object $dependency
      */
-    public function setDependencies($className, $dependency)
+    private function setDependencies($className, $dependency)
     {
         //check if param is a object, if true, push new instance of that object into array
         if (is_object($dependency->getClass())) {
@@ -52,5 +52,27 @@ class Dic
     public function getDependencies($className)
     {
         return $this->dependencies[$className];
+    }
+
+    public function clearCache($className = null)
+    {
+        if ($className !== null) {
+            unset($this->loaders[$className]);
+            unset($this->dependencies[$className]);
+            if (!isset($this->dependencies[$className]) && !isset($this->loaders[$className])) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } else {
+            unset($this->loaders);
+            unset($this->dependencies);
+            if (!isset($this->dependencies) && !isset($this->loaders)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 }
