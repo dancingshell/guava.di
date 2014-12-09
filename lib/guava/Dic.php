@@ -52,7 +52,9 @@ class Dic
      */
     public function getDependencies($className)
     {
-        return $this->dependencies[$className];
+        if ($this->dependencies[$className] !== array()) {
+            return $this->dependencies[$className];
+        }
     }
 
     public function isLoaded($className, $dep = false)
