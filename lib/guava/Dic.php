@@ -28,20 +28,22 @@ class Dic
             //create reflection class to inspect the __constructor parameters of the given class tp find dependencies
             $reflection = new \ReflectionClass('\\guava\\Controllers\\'.$className);
             $constructor = $reflection->getConstructor();
-
             $params = $constructor->getParameters();
             //set empty array to push into later
             $this->dependencies[$className] = array();
 
             foreach ($params as $dependency) {
-                $depReflection = new \ReflectionClass($dependency->getClass()->name);
-                if ($depReflection->isAbstract() && $configs != false) {
-                    foreach($configs as $config) {
-                        $parent = end(explode($depReflection->name,"\\"));
-                        $lookup = $this->registry[$className][$parent][$config];
-                        if (is_callable($lookup)) {
-                             $dependency = $lookup;
-                        };
+                if ($dependency->getClass()) {
+                    $dependency = ucfirst($dependency->getName());
+                    $depReflection = new \ReflectionClass('\\guava\\Dependencies\\'.$dependency);
+                    if (($depReflection->isAbstract()) && ($configs != false)) {
+                        foreach ($configs as $config) {
+                            $parent = $depReflection->name;
+                            $lookup = $this->registry[$className][$parent][$config];
+                            if (is_callable($lookup)) {
+                                $dependency = $lookup;
+                            };
+                        }
                     }
                 }
                 $this->setDependencies($className, $dependency);
@@ -56,16 +58,15 @@ class Dic
      */
     private function setDependencies($className, $dependency)
     {
-        //check if param is a object, if true, push new instance of that object into array
-        if (is_object($dependency->getClass())) {
-            $class = $dependency->getClass()->name;
-            array_push($this->dependencies[$className], new $class);
-        } else (is_callable($dependency, false, $dependencyCall)) {
-            $result = call_user_func('dependencyCall');
+//        check if param is a object, if true, push new instance of that object into array
+        if (is_callable($dependency)) {
+            $result = call_user_func($dependency);
             array_push($this->dependencies[$className], $result);
+        } elseif (is_string($dependency)) {
+            $class = '\\guava\\Dependencies\\'.$dependency;
+            array_push($this->dependencies[$className], new $class);
         }
     }
-
     /**
      * @param String $className
      * @return Array
@@ -126,17 +127,11 @@ class Dic
         $reflection = new \ReflectionClass($specLocation);
         $parent = $reflection->getParentClass();
         $parentName = $parent->name;
-        var_dump($parentName);
-        if (!isset($this->registry[$parentName])) {
-            $this->registry[$parentName] = array();
-            if (!isset($this->registry[$className][$parentName][$spec])) {
-                $this->registry[$className][$parentName][$spec] = array();
-            }
-        }
+
         $specClosure = function() use($specLocation) {
             return new $specLocation;
         };
-        array_push($this->registry[$className][$parentName][$spec], $specClosure);
+        $this->registry[$className][$parentName][$spec] = $specClosure;
     }
 
     public function lazyGet()
