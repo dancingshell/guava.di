@@ -33,9 +33,12 @@ class Dic
             $this->dependencies[$className] = array();
 
             foreach ($params as $dependency) {
+                // remove all parameters that aren't objects and find classes that are abstract
                 if ($dependency->getClass()) {
                     $dependency = ucfirst($dependency->getName());
                     $depReflection = new \ReflectionClass('\\guava\\Dependencies\\'.$dependency);
+
+                    // check registry for classes declared under abstract classes
                     if (($depReflection->isAbstract()) && ($configs != false)) {
                         foreach ($configs as $config) {
                             $parent = $depReflection->name;
@@ -60,13 +63,13 @@ class Dic
     {
 //        check if param is a object, if true, push new instance of that object into array
         if (is_callable($dependency)) {
-            $result = call_user_func($dependency);
-            array_push($this->dependencies[$className], $result);
+            $this->lazyGet($className, $dependency);
         } elseif (is_string($dependency)) {
             $class = '\\guava\\Dependencies\\'.$dependency;
             array_push($this->dependencies[$className], new $class);
         }
     }
+
     /**
      * @param String $className
      * @return Array
@@ -134,8 +137,9 @@ class Dic
         $this->registry[$className][$parentName][$spec] = $specClosure;
     }
 
-    public function lazyGet()
+    public function lazyGet($className, $dependency)
     {
-
+        $result = call_user_func($dependency);
+        array_push($this->dependencies[$className], $result);
     }
 }
