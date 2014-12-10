@@ -3,7 +3,7 @@ namespace guava;
 
 use guava\Dependencies\Bun;
 use guava\Dependencies\Cheese;
-use guava\Dependencies\Meat;
+use guava\Dependencies\Turkey;
 
 class DicTest extends \PHPUnit_Framework_TestCase {
 
@@ -17,8 +17,8 @@ class DicTest extends \PHPUnit_Framework_TestCase {
     public function testLoad()
     {
         $this->assertEquals(
-            array(new Bun(), new Cheese(), new Meat()),
-            $this->di->load('Sandwich')
+            array(new Bun(), new Cheese(), new Turkey()),
+            $this->di->load('Sandwich', 'Turkey')
         );
     }
 
@@ -26,7 +26,7 @@ class DicTest extends \PHPUnit_Framework_TestCase {
     {
         $this->di->load('Sandwich');
         $this->assertEquals(
-            array(new Bun(), new Cheese(), new Meat()),
+            array(new Bun(), new Cheese(), new Turkey()),
             $this->di->getDependencies('Sandwich')
         );
     }
@@ -70,7 +70,6 @@ class DicTest extends \PHPUnit_Framework_TestCase {
             false,
             $this->di->isLoaded('Sandwich')
         );
-
     }
 
     public function testClearCache()
@@ -83,6 +82,14 @@ class DicTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(
             true,
             $this->di->clearCache()
+        );
+    }
+
+    public function testLazySet()
+    {
+        $this->assertEquals(
+            new Turkey(),
+            $this->di->lazySet('Sandwich', 'Turkey', 'guava\Dependencies\Turkey')
         );
     }
 }
