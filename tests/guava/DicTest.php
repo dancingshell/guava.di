@@ -3,7 +3,7 @@ namespace guava;
 
 use guava\Dependencies\Bun;
 use guava\Dependencies\Cheese;
-use guava\Dependencies\Meat;
+use guava\Dependencies\Turkey;
 
 class DicTest extends \PHPUnit_Framework_TestCase {
 
@@ -12,21 +12,22 @@ class DicTest extends \PHPUnit_Framework_TestCase {
     public function setUp()
     {
         $this->di = new Dic();
+        $this->di->lazySet('Sandwich', 'Turkey', 'guava\\Dependencies\\Turkey');
     }
 
     public function testLoad()
     {
         $this->assertEquals(
-            array(new Bun(), new Cheese(), new Meat()),
-            $this->di->load('Sandwich')
+            array(new Bun(), new Cheese(), new Turkey()),
+            $this->di->load('Sandwich', 'Turkey')
         );
     }
 
     public function testGetDependencies()
     {
-        $this->di->load('Sandwich');
+        $this->di->load('Sandwich', 'Turkey');
         $this->assertEquals(
-            array(new Bun(), new Cheese(), new Meat()),
+            array(new Bun(), new Cheese(), new Turkey()),
             $this->di->getDependencies('Sandwich')
         );
     }
@@ -40,7 +41,7 @@ class DicTest extends \PHPUnit_Framework_TestCase {
         );
 
         // tests after Sandwich is loaded
-        $this->di->load('Sandwich');
+        $this->di->load('Sandwich', 'Turkey');
         $this->assertEquals(
             true,
             $this->di->isLoaded('Sandwich')
@@ -70,12 +71,11 @@ class DicTest extends \PHPUnit_Framework_TestCase {
             false,
             $this->di->isLoaded('Sandwich')
         );
-
     }
 
     public function testClearCache()
     {
-        $this->di->load('Sandwich');
+        $this->di->load('Sandwich', 'Turkey');
         $this->assertEquals(
             true,
             $this->di->clearCache('Sandwich')
@@ -85,4 +85,5 @@ class DicTest extends \PHPUnit_Framework_TestCase {
             $this->di->clearCache()
         );
     }
+
 }

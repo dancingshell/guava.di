@@ -1,7 +1,7 @@
 <?php
 namespace guava\Dependencies;
 
-abstract class Meat
+class Turkey extends Meat
 {
 
 }
